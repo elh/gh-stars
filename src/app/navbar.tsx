@@ -14,7 +14,7 @@ export function NavBar() {
       {username && (
         <div className="text-sm pr-4">
           <span>{username}</span>
-          <button className="btn btn-xs ml-2" onClick={() => setUsername('')} >
+          <button className="btn btn-sm ml-2" onClick={() => setUsername('')} >
             Update
           </button>
         </div>

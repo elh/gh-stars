@@ -1,4 +1,5 @@
 import NavBar from './navbar';
+import StarChart from './star_chart';
 import UsernameInput from './username_input';
 
 export function Home() {
@@ -7,6 +8,7 @@ export function Home() {
       <NavBar />
       <div className="flex items-center justify-center">
         <UsernameInput />
+        <StarChart />
       </div>
     </div>
   );
