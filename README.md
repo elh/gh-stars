@@ -6,4 +6,4 @@
 nx serve gh-stars
 ```
 
-Built with Nx, Vite, and TailwindCSS.
+Built with Nx, Vite, and React.

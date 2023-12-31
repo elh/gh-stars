@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
 import { useStore } from './store';
 
 // AG Grid
@@ -7,6 +7,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 
 export function StarChart() {
+  const gridRef = useRef();
+
   // Store
   const { username, githubStars, loading } = useStore((state) => ({
     username: state.username,
@@ -16,9 +18,6 @@ export function StarChart() {
 
   // AG Grid
   const gridOptions = useMemo(() => ({
-    defaultColDef: {
-      filter: 'agTextColumnFilter'
-    },
     autoSizeStrategy: {
         type: 'fitCellContents',
     }
@@ -39,6 +38,13 @@ export function StarChart() {
     }));
   }, [githubStars]);
 
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
+
   // Render
   if (!username) {
     return null;
@@ -57,15 +63,27 @@ export function StarChart() {
 
   return (
     <div className="flex items-center justify-center h-full w-full">
-      <div className="h-full w-full">
+      <div className="flex flex-col h-full w-full">
         {loading && (
           <div className="text-center mb-2">
             <div className="text-sm text-gray-500">Loading ...</div>
           </div>
         )}
+        <input
+          type="text"
+          className="input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto"
+          id="filter-text-box"
+          placeholder="Filter..."
+          onInput={onFilterTextBoxChanged}
+        />
         {githubStars.get(username) && (
-          <div className="ag-theme-balham h-full w-full">
-            <AgGridReact rowData={rowData} columnDefs={colDefs} gridOptions={gridOptions}/>
+          <div className="ag-theme-balham h-5/6 w-full">
+            <AgGridReact
+              ref={gridRef}
+              rowData={rowData}
+              columnDefs={colDefs}
+              gridOptions={gridOptions}
+            />
           </div>
         )}
       </div>
