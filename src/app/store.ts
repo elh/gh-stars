@@ -19,20 +19,20 @@ export const useStore = create<Store>((set, get) => ({
     try {
       let page = 1;
       let stars: any[] = [];
-      while (true) {
-        const response = await fetch(`https://api.github.com/users/${username}/starred?per_page=100&page=${page}`);
-        const data = await response.json();
-        if (data.length === 0) {
-          break;
+      let updatedGithubStars = new Map<string, any[]>(get().githubStars);
+      if (!updatedGithubStars.has(username)) {
+        while (true) {
+          const response = await fetch(`https://api.github.com/users/${username}/starred?per_page=100&page=${page}`);
+          const data = await response.json();
+          if (data.length === 0) {
+            break;
+          }
+          stars = [...stars, ...data];
+          updatedGithubStars.set(username, stars);
+          set({ githubStars: updatedGithubStars });
+          page++;
         }
-        stars = [...stars, ...data];
-        page++;
       }
-      const updatedGithubStars = new Map<string, any[]>([
-        ...get().githubStars,
-        [username, stars],
-      ]);
-      set({ githubStars: updatedGithubStars });
     } catch (error) {
       console.error(error);
     } finally {
