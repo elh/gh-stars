@@ -33,6 +33,7 @@
     "@vitest/coverage-v8": "~0.34.6",
     "@vitest/ui": "~0.34.6",
     "autoprefixer": "10.4.13",
+    "daisyui": "^4.4.24",
     "eslint": "~8.48.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "2.27.5",
