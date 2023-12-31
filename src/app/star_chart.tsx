@@ -13,16 +13,20 @@ const customStyles = {
     'input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto',
   // TODO: text treatment of this placeholder is not quite right to default input
   placeholder: (_: any) => 'text-stone-400',
-  menu: (_: any) =>
-    'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
+  menu: (_: any) => 'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
   menuList: (_: any) => 'text-sm z-50 max-w-xs',
   noOptionsMessage: (_: any) => 'text-sm z-50 max-w-xs',
-}
+};
 
 // TODO: support rendering for multiple users. everyone user is following?
 export function StarChart() {
   const gridRef = useRef();
-  const [filterObj, setFilterObj] = useState({});
+  const [filterObj, setFilterObj] = useState({
+    languages: [],
+    topics: [],
+    owners: [],
+  });
+  const [selectedTopicsValue, setSelectedTopicsValue] = useState([]);
 
   // Store
   const { username, githubStars, loading } = useStore((state) => ({
@@ -90,6 +94,34 @@ export function StarChart() {
                   <span
                     key={index}
                     className="text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full"
+                    onClick={() => {
+                      setFilterObj((prevFilterObj) => {
+                        const updatedTopics = prevFilterObj.topics.includes(topic)
+                          ? prevFilterObj.topics
+                          : [...prevFilterObj.topics, topic];
+
+                        return {
+                          ...prevFilterObj,
+                          topics: updatedTopics,
+                        };
+                      });
+                      setSelectedTopicsValue((prevSelectedTopicsValue) => {
+                        const exists = prevSelectedTopicsValue.some(
+                          (item) => item.value === topic && item.label === topic
+                        );
+                        if (!exists) {
+                          return [
+                            ...prevSelectedTopicsValue,
+                            {
+                              value: topic,
+                              label: topic,
+                            },
+                          ];
+                        }
+                        return prevSelectedTopicsValue;
+                      });
+                      gridRef.current.api.onFilterChanged();
+                    }}
                   >
                     {topic}
                   </span>
@@ -149,21 +181,18 @@ export function StarChart() {
     (node) => {
       if (node.data) {
         if (
-          filterObj.languages &&
           filterObj.languages.length > 0 &&
           !filterObj.languages.includes(node.data.language)
         ) {
           return false;
         }
         if (
-          filterObj.topics &&
           filterObj.topics.length > 0 &&
           !filterObj.topics.some((topic) => node.data.topics.includes(topic))
         ) {
           return false;
         }
         if (
-          filterObj.owners &&
           filterObj.owners.length > 0 &&
           !filterObj.owners.includes(node.data.owner)
         ) {
@@ -175,6 +204,7 @@ export function StarChart() {
     [filterObj]
   );
 
+  // TODO: filter down options to those in the currently filtered set?
   const languageOptions = useMemo(() => {
     const userStars = githubStars.get(username);
     if (!userStars) {
@@ -255,6 +285,7 @@ export function StarChart() {
       ...prevFilterObj,
       topics: selectedOptions.map((option) => option.value),
     }));
+    setSelectedTopicsValue(selectedOptions);
     gridRef.current.api.onFilterChanged();
   }, []);
 
@@ -312,6 +343,7 @@ export function StarChart() {
           menuPosition="fixed"
           classNames={customStyles}
           onChange={onTopicsFilterChanged}
+          value={selectedTopicsValue}
         />
         <Select
           isMulti
@@ -328,7 +360,7 @@ export function StarChart() {
           type="text"
           className="input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto"
           id="filter-text-box"
-          placeholder="Text Filter"
+          placeholder="Text Filter..."
           onInput={onFilterTextBoxChanged}
         />
         {githubStars.get(username) && (
