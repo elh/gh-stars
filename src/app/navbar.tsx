@@ -7,12 +7,12 @@ export function NavBar() {
   }));
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar px-8 bg-base-100">
       <div className="flex-1">
-        <a className="btn btn-ghost text-lg">Star Explorer</a>
+        <a className="text-lg">Star Explorer</a>
       </div>
       {username && (
-        <div className="text-sm pr-4">
+        <div className="text-sm">
           <span>{username}</span>
           <button className="btn btn-sm ml-2" onClick={() => setUsername('')} >
             Update

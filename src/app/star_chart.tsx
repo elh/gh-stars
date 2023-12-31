@@ -23,7 +23,14 @@ export function StarChart() {
     }
   }), []);
   const colDefs = useMemo(
-    () => [{ field: 'name' }, { field: 'owner' }, { field: 'description' }],
+    () => [
+      { field: 'name' },
+      { field: 'description' },
+      { field: 'language' },
+      // TODO: custom renderer for topic pills
+      // { field: 'topics' }
+      { field: 'stars' },
+    ],
     []
   );
   const rowData = useMemo(() => {
@@ -32,9 +39,11 @@ export function StarChart() {
       return [];
     }
     return userStars.map((star) => ({
-      name: star.name,
-      owner: star.owner.login,
+      name: star.full_name,
       description: star.description,
+      language: star.language,
+      topics: star.topics.join(', '),
+      stars: star.stargazers_count,
     }));
   }, [githubStars]);
 
@@ -77,7 +86,7 @@ export function StarChart() {
           onInput={onFilterTextBoxChanged}
         />
         {githubStars.get(username) && (
-          <div className="ag-theme-balham h-5/6 w-full">
+          <div className="ag-theme-balham h-[95%] w-full">
             <AgGridReact
               ref={gridRef}
               rowData={rowData}

@@ -6,7 +6,7 @@ export function Home() {
   return (
     <div className="grid grid-rows-[auto,1fr] h-screen">
       <NavBar />
-      <div className="flex items-center justify-center p-4">
+      <div className="flex items-center justify-center py-2 px-8">
         <UsernameInput />
         <StarChart />
       </div>
