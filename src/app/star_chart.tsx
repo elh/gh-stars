@@ -24,12 +24,41 @@ export function StarChart() {
   }), []);
   const colDefs = useMemo(
     () => [
-      { field: 'name' },
-      { field: 'description' },
-      { field: 'language' },
-      // TODO: custom renderer for topic pills
-      // { field: 'topics' }
-      { field: 'stars' },
+      {
+        field: 'name',
+        cellRenderer: function(params) {
+          return (
+            <>
+              <a className="font-bold" href={params.data.owner_html_url} target="_blank" rel="noopener">{params.data.owner}</a>
+              /
+              <a className="font-bold" href={params.data.html_url} target="_blank" rel="noopener">{params.value}</a>
+            </>
+          );
+        }
+      },
+      {
+        field: 'description',
+        maxWidth: 800,
+      },
+      {
+        field: 'language'
+      },
+      {
+        field: 'stars',
+        cellRenderer: function(params) {
+          const num = params.value;
+          if (num > 500) {
+            return (
+              <div title={num}>
+                {(num / 1000).toFixed(1)}k
+              </div>
+            )
+          } else {
+            return num;
+          }
+        }
+      },
+      // TODO: custom renderer for topic pills. maybe in descriptions
     ],
     []
   );
@@ -39,10 +68,13 @@ export function StarChart() {
       return [];
     }
     return userStars.map((star) => ({
-      name: star.full_name,
+      owner: star.owner.login,
+      name: star.name,
+      html_url: star.html_url,
+      owner_html_url: star.owner.html_url,
       description: star.description,
       language: star.language,
-      topics: star.topics.join(', '),
+      topics: star.topics,
       stars: star.stargazers_count,
     }));
   }, [githubStars]);
