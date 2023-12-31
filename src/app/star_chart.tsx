@@ -93,10 +93,12 @@ export function StarChart() {
                 {params.data.topics.map((topic, index) => (
                   <span
                     key={index}
-                    className="text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full"
+                    className={`text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full ${
+                      filterObj.topics.includes(topic) ? 'btn-secondary' : ''
+                    }`}
                     onClick={() => {
                       setFilterObj((prevFilterObj) => {
-                        const updatedTopics = prevFilterObj.topics.includes(topic)
+                        const updatedTopics = prevFilterObj.topics.some((item) => item.value === topic)
                           ? prevFilterObj.topics
                           : [...prevFilterObj.topics, topic];
 
@@ -107,7 +109,7 @@ export function StarChart() {
                       });
                       setSelectedTopicsValue((prevSelectedTopicsValue) => {
                         const exists = prevSelectedTopicsValue.some(
-                          (item) => item.value === topic && item.label === topic
+                          (item) => item.value === topic
                         );
                         if (!exists) {
                           return [
@@ -146,7 +148,7 @@ export function StarChart() {
         },
       },
     ],
-    []
+    [filterObj]
   );
   const rowData = useMemo(() => {
     const userStars = githubStars.get(username);
