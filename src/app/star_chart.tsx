@@ -22,7 +22,9 @@ export function StarChart() {
     );
   }
 
-  if (!githubStars) {
+  const userStars = githubStars.get(username);
+
+  if (!userStars) {
     return (
       <div className="flex items-center justify-center">
         <div className="text-center">
@@ -37,7 +39,7 @@ export function StarChart() {
   return (
     <div className="flex items-center justify-center">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {githubStars.map((star) => (
+        {userStars.map((star) => (
           <div key={star.id} className="card bordered">
             <div className="card-body">
               <figure>
