@@ -5,6 +5,11 @@
  Delete this file and get started with your project!
  * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
+
+function Hello() {
+  return <div className="bg-indigo-500 p-2 font-mono">Hello!</div>;
+}
+
 export function NxWelcome({ title }: { title: string }) {
   return (
     <>
@@ -423,6 +428,7 @@ export function NxWelcome({ title }: { title: string }) {
           `,
         }}
       />
+      <Hello></Hello>
       <div className="wrapper">
         <div className="container">
           <div id="welcome">
