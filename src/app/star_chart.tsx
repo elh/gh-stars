@@ -6,6 +6,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 
+// TODO: support rendering for multiple users. everyone user is following?
 export function StarChart() {
   const gridRef = useRef();
 
@@ -39,6 +40,19 @@ export function StarChart() {
       {
         field: 'description',
         maxWidth: 800,
+        autoHeight: true,
+        cellRenderer: function(params) {
+          return (
+            <div>
+              <div className={params.data.topics.length > 0 && params.value ? 'mb-[-0.6rem]' : ''}>{params.value}</div>
+              <div className="overflow-auto no-scrollbar">
+                {params.data.topics.map((topic, index) => (
+                  <span key={index} className="text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full">{topic}</span>
+                ))}
+              </div>
+            </div>
+          );
+        }
       },
       {
         field: 'language'
@@ -58,7 +72,6 @@ export function StarChart() {
           }
         }
       },
-      // TODO: custom renderer for topic pills. maybe in descriptions
     ],
     []
   );
@@ -91,6 +104,7 @@ export function StarChart() {
     return null;
   }
 
+  // TODO: move loading to header. show progress bar and expected total count from html
   if (!loading && !githubStars.get(username)) {
     return (
       <div className="flex items-center justify-center">

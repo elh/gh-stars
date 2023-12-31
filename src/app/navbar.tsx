@@ -15,7 +15,7 @@ export function NavBar() {
         <div className="text-sm">
           <span>{username}</span>
           <button className="btn btn-sm ml-2" onClick={() => setUsername('')} >
-            Update
+            Switch
           </button>
         </div>
       )}

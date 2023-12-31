@@ -3,9 +3,15 @@
 @tailwind utilities;
 /* You can add global styles to this file, and also import other style files */
 
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* i like small text size... */
+
 html {
     font-size: 12px;
 }
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* style AG Grid */
 
 /* hack: boosting specificity with html*/
 html {
@@ -18,5 +24,25 @@ html {
         --ag-background-color: oklch(0.9451 0.179 104.32);
         --ag-odd-row-background-color: oklch(0.9451 0.179 104.32);
         --ag-row-hover-color: oklch(0.7422 0.209 6.35);
+    }
+}
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* hide ugly scrollbars */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* hack: boosting specificity with html*/
+html {
+    .ag-apple-scrollbar {
+        display: none;
     }
 }
