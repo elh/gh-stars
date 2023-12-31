@@ -6,3 +6,17 @@
 html {
     font-size: 12px;
 }
+
+/* hack: boosting specificity with html*/
+html {
+    .ag-theme-balham {
+        --ag-header-foreground-color: black;
+        --ag-header-background-color: oklch(0.7422 0.209 6.35);
+        --ag-subheader-background-color: oklch(0.7422 0.209 6.35);
+        --ag-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        --ag-font-size: 0.8rem;
+        --ag-background-color: oklch(0.9451 0.179 104.32);
+        --ag-odd-row-background-color: oklch(0.9451 0.179 104.32);
+        --ag-row-hover-color: oklch(0.7422 0.209 6.35);
+    }
+}

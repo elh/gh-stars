@@ -1,19 +1,47 @@
-import { useStore } from './store'
+import { useMemo } from 'react';
+import { useStore } from './store';
+
+// AG Grid
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-balham.css';
 
 export function StarChart() {
+  // Store
   const { username, githubStars, loading } = useStore((state) => ({
     username: state.username,
     githubStars: state.githubStars,
     loading: state.loading,
   }));
 
+  // AG Grid
+  const gridOptions = useMemo(() => ({
+    autoSizeStrategy: {
+        type: 'fitCellContents',
+    }
+  }), []);
+  const colDefs = useMemo(
+    () => [{ field: 'name' }, { field: 'owner' }, { field: 'description' }],
+    []
+  );
+  const rowData = useMemo(() => {
+    const userStars = githubStars.get(username);
+    if (!userStars) {
+      return [];
+    }
+    return userStars.map((star) => ({
+      name: star.name,
+      owner: star.owner.login,
+      description: star.description,
+    }));
+  }, [githubStars]);
+
+  // Render
   if (!username) {
     return null;
   }
 
-  const userStars = githubStars.get(username);
-
-  if (!loading && !userStars) {
+  if (!loading && !githubStars.get(username)) {
     return (
       <div className="flex items-center justify-center">
         <div className="text-center">
@@ -24,33 +52,20 @@ export function StarChart() {
     );
   }
 
-  // TODO: turn this into a table
   return (
-    <div className="flex items-center justify-center">
-      {loading && (
-        <div className="text-center">
-          <div className="text-sm text-gray-500">Loading ...</div>
-        </div>
-      )}
-      {userStars && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {userStars.map((star) => (
-            <div key={star.id} className="card bordered">
-              <div className="card-body">
-                <figure>
-                  <img src={star.owner.avatar_url} alt={star.owner.login} style={{ width: '50px', height: '50px' }} />
-                </figure>
-                <h2 className="card-title text-sm">
-                  <a href={`https://github.com/${star.owner.login}/${star.name}`} target="_blank" rel="noopener noreferrer" className="card-title text-sm">
-                    {star.owner.login}/{star.name}
-                  </a>
-                </h2>
-                <p className="text-gray-700 text-xs">{star.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="flex items-center justify-center h-full w-full">
+      <div className="h-full w-full">
+        {loading && (
+          <div className="text-center mb-2">
+            <div className="text-sm text-gray-500">Loading ...</div>
+          </div>
+        )}
+        {githubStars.get(username) && (
+          <div className="ag-theme-balham h-full w-full">
+            <AgGridReact rowData={rowData} columnDefs={colDefs} gridOptions={gridOptions}/>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
