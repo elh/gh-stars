@@ -6,8 +6,18 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 
-import Select, { StylesConfig } from 'react-select';
-import { on } from 'events';
+import Select from 'react-select';
+
+const customStyles = {
+  control: (_: any) =>
+    'input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto',
+  // TODO: text treatment of this placeholder is not quite right to default input
+  placeholder: (_: any) => 'text-stone-400',
+  menu: (_: any) =>
+    'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
+  menuList: (_: any) => 'text-sm z-50 max-w-xs',
+  noOptionsMessage: (_: any) => 'text-sm z-50 max-w-xs',
+}
 
 // TODO: support rendering for multiple users. everyone user is following?
 export function StarChart() {
@@ -121,7 +131,7 @@ export function StarChart() {
       topics: star.topics,
       stars: star.stargazers_count,
     }));
-  }, [githubStars]);
+  }, [githubStars, username]);
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
@@ -142,6 +152,20 @@ export function StarChart() {
           filterObj.languages &&
           filterObj.languages.length > 0 &&
           !filterObj.languages.includes(node.data.language)
+        ) {
+          return false;
+        }
+        if (
+          filterObj.topics &&
+          filterObj.topics.length > 0 &&
+          !filterObj.topics.some((topic) => node.data.topics.includes(topic))
+        ) {
+          return false;
+        }
+        if (
+          filterObj.owners &&
+          filterObj.owners.length > 0 &&
+          !filterObj.owners.includes(node.data.owner)
         ) {
           return false;
         }
@@ -171,13 +195,74 @@ export function StarChart() {
       }));
 
     return languages;
-  }, [githubStars]);
+  }, [githubStars, username]);
+
+  const topicOptions = useMemo(() => {
+    const userStars = githubStars.get(username);
+    if (!userStars) {
+      return [];
+    }
+
+    const topicCounts = userStars.reduce((counts, star) => {
+      star.topics.forEach((topic) => {
+        counts[topic] = (counts[topic] || 0) + 1;
+      });
+      return counts;
+    }, {});
+
+    const topics = Object.entries(topicCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([topic, count]) => ({
+        value: topic,
+        label: `${topic} (${count})`,
+      }));
+
+    return topics;
+  }, [githubStars, username]);
+
+  const ownerOptions = useMemo(() => {
+    const userStars = githubStars.get(username);
+    if (!userStars) {
+      return [];
+    }
+
+    const ownerCounts = userStars.reduce((counts, star) => {
+      const owner = star.owner.login;
+      counts[owner] = (counts[owner] || 0) + 1;
+      return counts;
+    }, {});
+
+    const owners = Object.entries(ownerCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([owner, count]) => ({
+        value: owner,
+        label: `${owner} (${count})`,
+      }));
+
+    return owners;
+  }, [githubStars, username]);
 
   const onLanguagesFilterChanged = useCallback((selectedOptions) => {
-    setFilterObj({
-      ...filterObj,
+    setFilterObj((prevFilterObj) => ({
+      ...prevFilterObj,
       languages: selectedOptions.map((option) => option.value),
-    });
+    }));
+    gridRef.current.api.onFilterChanged();
+  }, []);
+
+  const onTopicsFilterChanged = useCallback((selectedOptions) => {
+    setFilterObj((prevFilterObj) => ({
+      ...prevFilterObj,
+      topics: selectedOptions.map((option) => option.value),
+    }));
+    gridRef.current.api.onFilterChanged();
+  }, []);
+
+  const onOwnersFilterChanged = useCallback((selectedOptions) => {
+    setFilterObj((prevFilterObj) => ({
+      ...prevFilterObj,
+      owners: selectedOptions.map((option) => option.value),
+    }));
     gridRef.current.api.onFilterChanged();
   }, []);
 
@@ -214,17 +299,30 @@ export function StarChart() {
           placeholder="Languages"
           unstyled={true}
           menuPosition="fixed"
-          classNames={{
-            control: (state) =>
-              'input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto',
-            // TODO: text treatment of this placeholder is not quite right to default input
-            placeholder: (state) => 'text-stone-400',
-            menu: (state) =>
-              'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
-            menuList: (state) => 'text-sm z-50 max-w-xs',
-            noOptionsMessage: (state) => 'text-sm z-50 max-w-xs',
-          }}
+          classNames={customStyles}
           onChange={onLanguagesFilterChanged}
+        />
+        <Select
+          isMulti
+          name="topics"
+          options={topicOptions}
+          className="basic-multi-select"
+          placeholder="Topics"
+          unstyled={true}
+          menuPosition="fixed"
+          classNames={customStyles}
+          onChange={onTopicsFilterChanged}
+        />
+        <Select
+          isMulti
+          name="owners"
+          options={ownerOptions}
+          className="basic-multi-select"
+          placeholder="Owners"
+          unstyled={true}
+          menuPosition="fixed"
+          classNames={customStyles}
+          onChange={onOwnersFilterChanged}
         />
         <input
           type="text"
