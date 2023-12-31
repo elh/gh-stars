@@ -46,3 +46,15 @@ html {
         display: none;
     }
 }
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/* select-react */
+
+html {
+    .css-cp01gg-control {
+        min-height: auto;
+    }
+    .css-4xgw5l-IndicatorsContainer2 {
+        display: none;
+    }
+}

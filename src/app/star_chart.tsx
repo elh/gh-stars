@@ -1,4 +1,4 @@
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback, useState } from 'react';
 import { useStore } from './store';
 
 // AG Grid
@@ -6,9 +6,13 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 
+import Select, { StylesConfig } from 'react-select';
+import { on } from 'events';
+
 // TODO: support rendering for multiple users. everyone user is following?
 export function StarChart() {
   const gridRef = useRef();
+  const [filterObj, setFilterObj] = useState({});
 
   // Store
   const { username, githubStars, loading } = useStore((state) => ({
@@ -18,59 +22,86 @@ export function StarChart() {
   }));
 
   // AG Grid
-  const gridOptions = useMemo(() => ({
-    autoSizeStrategy: {
+  const gridOptions = useMemo(
+    () => ({
+      suppressCellFocus: true,
+      autoSizeStrategy: {
         type: 'fitCellContents',
-    }
-  }), []);
+      },
+    }),
+    []
+  );
   const colDefs = useMemo(
     () => [
       {
         field: 'name',
-        cellRenderer: function(params) {
+        cellRenderer: function (params) {
           return (
             <>
-              <a className="font-bold" href={params.data.owner_html_url} target="_blank" rel="noopener">{params.data.owner}</a>
+              <a
+                className="font-bold"
+                href={params.data.owner_html_url}
+                target="_blank"
+                rel="noopener"
+              >
+                {params.data.owner}
+              </a>
               /
-              <a className="font-bold" href={params.data.html_url} target="_blank" rel="noopener">{params.value}</a>
+              <a
+                className="font-bold"
+                href={params.data.html_url}
+                target="_blank"
+                rel="noopener"
+              >
+                {params.value}
+              </a>
             </>
           );
-        }
+        },
       },
       {
         field: 'description',
         maxWidth: 800,
         autoHeight: true,
-        cellRenderer: function(params) {
+        cellRenderer: function (params) {
           return (
             <div>
-              <div className={params.data.topics.length > 0 && params.value ? 'mb-[-0.6rem]' : ''}>{params.value}</div>
+              <div
+                className={
+                  params.data.topics.length > 0 && params.value
+                    ? 'mb-[-0.6rem]'
+                    : ''
+                }
+              >
+                {params.value}
+              </div>
               <div className="overflow-auto no-scrollbar">
                 {params.data.topics.map((topic, index) => (
-                  <span key={index} className="text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full">{topic}</span>
+                  <span
+                    key={index}
+                    className="text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full"
+                  >
+                    {topic}
+                  </span>
                 ))}
               </div>
             </div>
           );
-        }
+        },
       },
       {
-        field: 'language'
+        field: 'language',
       },
       {
         field: 'stars',
-        cellRenderer: function(params) {
+        cellRenderer: function (params) {
           const num = params.value;
           if (num > 500) {
-            return (
-              <div title={num}>
-                {(num / 1000).toFixed(1)}k
-              </div>
-            )
+            return <div title={num}>{(num / 1000).toFixed(1)}k</div>;
           } else {
             return num;
           }
-        }
+        },
       },
     ],
     []
@@ -99,6 +130,57 @@ export function StarChart() {
     );
   }, []);
 
+  // AG Grid external filter
+  const isExternalFilterPresent = useCallback(() => {
+    return Object.keys(filterObj).length > 0;
+  }, [filterObj]);
+
+  const doesExternalFilterPass = useCallback(
+    (node) => {
+      if (node.data) {
+        if (
+          filterObj.languages &&
+          filterObj.languages.length > 0 &&
+          !filterObj.languages.includes(node.data.language)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
+    [filterObj]
+  );
+
+  const languageOptions = useMemo(() => {
+    const userStars = githubStars.get(username);
+    if (!userStars) {
+      return [];
+    }
+
+    const languageCounts = userStars.reduce((counts, star) => {
+      const language = star.language || '<None>';
+      counts[language] = (counts[language] || 0) + 1;
+      return counts;
+    }, {});
+
+    const languages = Object.entries(languageCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([language, count]) => ({
+        value: language,
+        label: `${language} (${count})`,
+      }));
+
+    return languages;
+  }, [githubStars]);
+
+  const onLanguagesFilterChanged = useCallback((selectedOptions) => {
+    setFilterObj({
+      ...filterObj,
+      languages: selectedOptions.map((option) => option.value),
+    });
+    gridRef.current.api.onFilterChanged();
+  }, []);
+
   // Render
   if (!username) {
     return null;
@@ -124,11 +206,31 @@ export function StarChart() {
             <div className="text-sm text-gray-500">Loading ...</div>
           </div>
         )}
+        <Select
+          isMulti
+          name="languages"
+          options={languageOptions}
+          className="basic-multi-select"
+          placeholder="Languages"
+          unstyled={true}
+          menuPosition="fixed"
+          classNames={{
+            control: (state) =>
+              'input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto',
+            // TODO: text treatment of this placeholder is not quite right to default input
+            placeholder: (state) => 'text-stone-400',
+            menu: (state) =>
+              'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
+            menuList: (state) => 'text-sm z-50 max-w-xs',
+            noOptionsMessage: (state) => 'text-sm z-50 max-w-xs',
+          }}
+          onChange={onLanguagesFilterChanged}
+        />
         <input
           type="text"
           className="input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto"
           id="filter-text-box"
-          placeholder="Filter..."
+          placeholder="Text Filter"
           onInput={onFilterTextBoxChanged}
         />
         {githubStars.get(username) && (
@@ -138,6 +240,8 @@ export function StarChart() {
               rowData={rowData}
               columnDefs={colDefs}
               gridOptions={gridOptions}
+              isExternalFilterPresent={isExternalFilterPresent}
+              doesExternalFilterPass={doesExternalFilterPass}
             />
           </div>
         )}
