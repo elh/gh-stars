@@ -16,6 +16,9 @@ export function StarChart() {
 
   // AG Grid
   const gridOptions = useMemo(() => ({
+    defaultColDef: {
+      filter: 'agTextColumnFilter'
+    },
     autoSizeStrategy: {
         type: 'fitCellContents',
     }
