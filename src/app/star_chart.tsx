@@ -14,7 +14,10 @@ export function StarChart() {
   if (loading) {
     return (
       <div className="flex items-center justify-center">
-        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+        <div className="text-center">
+          <div className="text-xl font-bold">Loading ...</div>
+          <div className="text-sm text-gray-500">Please wait</div>
+        </div>
       </div>
     );
   }
@@ -23,8 +26,8 @@ export function StarChart() {
     return (
       <div className="flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl font-bold">No Stars</div>
-          <div className="text-gray-500">Try another username</div>
+          <div className="text-xl font-bold">No Stars</div>
+          <div className="text-sm text-gray-500">Try another username</div>
         </div>
       </div>
     );
@@ -40,7 +43,11 @@ export function StarChart() {
               <figure>
                 <img src={star.owner.avatar_url} alt={star.owner.login} style={{ width: '50px', height: '50px' }} />
               </figure>
-              <h2 className="card-title text-sm">{star.name}</h2>
+              <h2 className="card-title text-sm">
+                <a href={`https://github.com/${star.owner.login}/${star.name}`} target="_blank" rel="noopener noreferrer" className="card-title text-sm">
+                  {star.owner.login}/{star.name}
+                </a>
+              </h2>
               <p className="text-gray-700 text-xs">{star.description}</p>
             </div>
           </div>
