@@ -202,7 +202,7 @@ export function StarChart() {
         filterTextBox?.value
       );
     }
-  }, []);
+  }, [githubStars, username]);
 
   // AG Grid external filter
   const isExternalFilterPresent = useCallback(() => {
