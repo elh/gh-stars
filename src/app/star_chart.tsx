@@ -202,7 +202,7 @@ export function StarChart() {
         filterTextBox?.value
       );
     }
-  }, [githubStars, username]);
+  }, [githubStars, username, filterObj]);
 
   // AG Grid external filter
   const isExternalFilterPresent = useCallback(() => {
@@ -255,7 +255,7 @@ export function StarChart() {
     const languages = Object.entries(languageCounts)
       .sort((a, b) => b[1] - a[1])
       .map(([language, count]) => ({
-        value: language,
+        value: language !== '<None>' ? language : null,
         label: `${language} (${count})`,
       }));
 
