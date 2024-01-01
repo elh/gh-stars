@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
+  base : '/gh-stars/',
+
   root: __dirname,
   cacheDir: './node_modules/.vite/.',
 

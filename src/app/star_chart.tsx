@@ -380,6 +380,7 @@ export function StarChart() {
         <Select
           isMulti
           name="topics"
+          // @ts-ignore // options doesn't seem needed...
           options={topicOptions}
           className="basic-multi-select"
           placeholder="Topics"
