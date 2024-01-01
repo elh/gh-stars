@@ -14,7 +14,15 @@ export const useStore = create<Store>((set, get) => ({
   githubStars: new Map<string, any[]>(),
   loading: false,
   loading_fetched_count: 0,
-  setUsername: (username) => set({ username }),
+  setUsername: (username) => {
+    if (username && username.trim() !== '') {
+      const queryParams = new URLSearchParams(window.location.search);
+      queryParams.set('user', username);
+      const newUrl = `${window.location.pathname}?${queryParams.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+    set({ username });
+  },
   fetchGithubStars: async (username) => {
     set({
       loading: true,

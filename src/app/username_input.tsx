@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useStore } from './store'
 
 export function UsernameInput() {
-  // TODO: read/write username from url
   const { username, setUsername, fetchGithubStars } = useStore((state) => ({
     username: state.username,
     setUsername: state.setUsername,
@@ -21,6 +20,14 @@ export function UsernameInput() {
       setUsername(inputValue);
     }
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('user') && params.get('user') != "") {
+      const n = params.get('user') || "";
+      setUsername(n);
+    }
+  }, []);
 
   useEffect(() => {
     if (username) {

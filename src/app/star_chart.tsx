@@ -15,7 +15,7 @@ const customStyles = {
   // TODO: text treatment of this placeholder is not quite right to default input
   placeholder: (_: any) => 'text-stone-400',
   menu: (_: any) => 'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
-  menuList: (_: any) => 'text-sm z-50 max-w-xs',
+  menuList: (_: any) => 'text-sm z-50 max-w-xs no-scrollbar',
   noOptionsMessage: (_: any) => 'text-sm z-50 max-w-xs',
 };
 
