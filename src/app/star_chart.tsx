@@ -11,12 +11,11 @@ import Select from 'react-select';
 
 const customStyles = {
   control: (_: any) =>
-    'input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto',
-  // TODO: text treatment of this placeholder is not quite right to default input
+    'input input-xs input-bordered focus:outline-none mb-2',
   placeholder: (_: any) => 'text-stone-400',
-  menu: (_: any) => 'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
-  menuList: (_: any) => 'text-sm z-50 max-w-xs no-scrollbar',
-  noOptionsMessage: (_: any) => 'text-sm z-50 max-w-xs',
+  menu: (_: any) => 'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50',
+  menuList: (_: any) => 'text-sm z-50 no-scrollbar',
+  noOptionsMessage: (_: any) => 'text-sm z-50',
   // NOTE: underlying elements are not addressable so this doesn't work. hack directly in css
   clearIndicator: (_: any) => 'hidden',
   dropdownIndicator: (_: any) => 'hidden',
@@ -370,48 +369,56 @@ export function StarChart() {
             <div className="text-sm text-gray-500">Loading ... Fetched {loading_fetched_count}</div>
           </div>
         )}
-        <Select
-          isMulti
-          name="languages"
-          options={languageOptions}
-          className="basic-multi-select"
-          placeholder="Languages"
-          unstyled={true}
-          menuPosition="fixed"
-          classNames={customStyles}
-          onChange={onLanguagesFilterChanged}
-        />
-        <Select
-          isMulti
-          name="topics"
-          // @ts-ignore // options doesn't seem needed...
-          options={topicOptions}
-          className="basic-multi-select"
-          placeholder="Topics"
-          unstyled={true}
-          menuPosition="fixed"
-          classNames={customStyles}
-          onChange={onTopicsFilterChanged}
-          value={selectedTopicsValue}
-        />
-        <Select
-          isMulti
-          name="owners"
-          options={ownerOptions}
-          className="basic-multi-select"
-          placeholder="Owners"
-          unstyled={true}
-          menuPosition="fixed"
-          classNames={customStyles}
-          onChange={onOwnersFilterChanged}
-        />
-        <input
-          type="text"
-          className="input input-xs input-bordered focus:outline-none w-full max-w-xs mb-2 ml-auto"
-          id="filter-text-box"
-          placeholder="Text Filter..."
-          onInput={onFilterTextBoxChanged}
-        />
+        <div className="flex justify-end gap-2">
+          <div className="w-1/6">
+            <Select
+              isMulti
+              name="languages"
+              options={languageOptions}
+              className="basic-multi-select"
+              placeholder="Languages"
+              unstyled={true}
+              menuPosition="fixed"
+              classNames={customStyles}
+              onChange={onLanguagesFilterChanged}
+            />
+          </div>
+          <div className="w-1/6">
+            <Select
+              isMulti
+              name="topics"
+              // @ts-ignore // options doesn't seem needed...
+              options={topicOptions}
+              className="basic-multi-select"
+              placeholder="Topics"
+              unstyled={true}
+              menuPosition="fixed"
+              classNames={customStyles}
+              onChange={onTopicsFilterChanged}
+              value={selectedTopicsValue}
+            />
+          </div>
+          <div className="w-1/6">
+            <Select
+              isMulti
+              name="owners"
+              options={ownerOptions}
+              className="basic-multi-select"
+              placeholder="Owners"
+              unstyled={true}
+              menuPosition="fixed"
+              classNames={customStyles}
+              onChange={onOwnersFilterChanged}
+            />
+          </div>
+          <input
+            type="text"
+            className="input input-xs input-bordered focus:outline-none w-1/6 mb-2"
+            id="filter-text-box"
+            placeholder="Text Filter..."
+            onInput={onFilterTextBoxChanged}
+          />
+        </div>
         {githubStars.get(username) && (
           <div className="ag-theme-balham h-[95%] w-full">
             <AgGridReact
