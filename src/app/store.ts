@@ -3,7 +3,6 @@ import create from 'zustand';
 type Store = {
   username: string;
   githubStars: Map<string, any[]>;
-  githubStarsCount: Map<string, number>;
   loading: boolean;
   loading_fetched_count: number;
   setUsername: (username: string) => void;
@@ -13,7 +12,6 @@ type Store = {
 export const useStore = create<Store>((set, get) => ({
   username: '',
   githubStars: new Map<string, any[]>(),
-  githubStarsCount: new Map<string, number>(),
   loading: false,
   loading_fetched_count: 0,
   setUsername: (username) => set({ username }),
@@ -50,8 +48,3 @@ export const useStore = create<Store>((set, get) => ({
     }
   },
 }));
-
-function getGithubStarsCount(user: string): number {
-  // TODO
-  return 0
-}

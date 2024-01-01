@@ -362,6 +362,7 @@ export function StarChart() {
     <div className="flex items-center justify-center h-full w-full">
       <div className="flex flex-col h-full w-full">
         {loading && (
+          // TODO: signal to user total number of stars. GraphQL API requires auth
           <div className="text-center mb-2">
             <div className="text-sm text-gray-500">Loading ... Fetched {loading_fetched_count}</div>
           </div>
