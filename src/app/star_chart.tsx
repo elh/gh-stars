@@ -1,10 +1,11 @@
-import { useMemo, useRef, useCallback, useState } from 'react';
+import { useMemo, useRef, useCallback, useState,createRef } from 'react';
 import { useStore } from './store';
 
 // AG Grid
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
+import { ICellRendererParams, IRowNode, GridOptions } from 'ag-grid-community';
 
 import Select from 'react-select';
 
@@ -20,8 +21,12 @@ const customStyles = {
 
 // TODO: support rendering for multiple users. everyone user is following?
 export function StarChart() {
-  const gridRef = useRef();
-  const [filterObj, setFilterObj] = useState({
+  const gridRef = createRef<AgGridReact>();
+  const [filterObj, setFilterObj] = useState<{
+    languages: string[];
+    topics: string[];
+    owners: string[];
+  }>({
     languages: [],
     topics: [],
     owners: [],
@@ -36,7 +41,7 @@ export function StarChart() {
   }));
 
   // AG Grid
-  const gridOptions = useMemo(
+  const gridOptions: GridOptions = useMemo(
     () => ({
       suppressCellFocus: true,
       autoSizeStrategy: {
@@ -49,7 +54,7 @@ export function StarChart() {
     () => [
       {
         field: 'name',
-        cellRenderer: function (params) {
+        cellRenderer: function (params: ICellRendererParams) {
           return (
             <>
               <a
@@ -77,7 +82,7 @@ export function StarChart() {
         field: 'description',
         maxWidth: 800,
         autoHeight: true,
-        cellRenderer: function (params) {
+        cellRenderer: function (params: ICellRendererParams) {
           return (
             <div>
               <div
@@ -90,39 +95,57 @@ export function StarChart() {
                 {params.value}
               </div>
               <div className="overflow-auto no-scrollbar">
-                {params.data.topics.map((topic, index) => (
+                {params.data.topics.map((topic: string, index: number) => (
                   <span
                     key={index}
                     className={`text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full ${
                       filterObj.topics.includes(topic) ? 'btn-secondary' : ''
                     }`}
                     onClick={() => {
-                      setFilterObj((prevFilterObj) => {
-                        const updatedTopics = prevFilterObj.topics.some((item) => item.value === topic)
-                          ? prevFilterObj.topics
-                          : [...prevFilterObj.topics, topic];
-
-                        return {
+                      if (filterObj.topics.includes(topic)) {
+                        setFilterObj((prevFilterObj) => ({
                           ...prevFilterObj,
-                          topics: updatedTopics,
-                        };
-                      });
-                      setSelectedTopicsValue((prevSelectedTopicsValue) => {
-                        const exists = prevSelectedTopicsValue.some(
-                          (item) => item.value === topic
+                          topics: prevFilterObj.topics.filter(
+                            (item) => item !== topic
+                          ),
+                        }));
+                        setSelectedTopicsValue((prevSelectedTopicsValue) =>
+                          prevSelectedTopicsValue.filter(
+                            (item: { value: string }) => item.value !== topic
+                          )
                         );
-                        if (!exists) {
-                          return [
-                            ...prevSelectedTopicsValue,
-                            {
-                              value: topic,
-                              label: topic,
-                            },
-                          ];
-                        }
-                        return prevSelectedTopicsValue;
-                      });
-                      gridRef.current.api.onFilterChanged();
+                      } else {
+                        setFilterObj((prevFilterObj) => {
+                          const updatedTopics = prevFilterObj.topics.some(
+                            (item) => item === topic
+                          )
+                            ? prevFilterObj.topics
+                            : [...prevFilterObj.topics, topic];
+
+                          return {
+                            ...prevFilterObj,
+                            topics: updatedTopics,
+                          };
+                        });
+                        setSelectedTopicsValue((prevSelectedTopicsValue: any) => {
+                          const exists = prevSelectedTopicsValue.some(
+                            (item: { value: string }) => item.value === topic
+                          );
+                          if (!exists) {
+                            return [
+                              ...prevSelectedTopicsValue,
+                              {
+                                value: topic,
+                                label: topic,
+                              },
+                            ];
+                          }
+                          return prevSelectedTopicsValue;
+                        });
+                      }
+                      if (gridRef.current) {
+                        gridRef.current.api.onFilterChanged();
+                      }
                     }}
                   >
                     {topic}
@@ -138,7 +161,7 @@ export function StarChart() {
       },
       {
         field: 'stars',
-        cellRenderer: function (params) {
+        cellRenderer: function (params: ICellRendererParams) {
           const num = params.value;
           if (num > 500) {
             return <div title={num}>{(num / 1000).toFixed(1)}k</div>;
@@ -168,10 +191,13 @@ export function StarChart() {
   }, [githubStars, username]);
 
   const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current.api.setGridOption(
-      'quickFilterText',
-      document.getElementById('filter-text-box').value
-    );
+    if (gridRef.current) {
+      const filterTextBox = document.getElementById('filter-text-box') as HTMLInputElement;
+      gridRef.current.api.setGridOption(
+        'quickFilterText',
+        filterTextBox?.value
+      );
+    }
   }, []);
 
   // AG Grid external filter
@@ -180,7 +206,7 @@ export function StarChart() {
   }, [filterObj]);
 
   const doesExternalFilterPass = useCallback(
-    (node) => {
+    (node: IRowNode) => {
       if (node.data) {
         if (
           filterObj.languages.length > 0 &&
@@ -213,11 +239,14 @@ export function StarChart() {
       return [];
     }
 
-    const languageCounts = userStars.reduce((counts, star) => {
-      const language = star.language || '<None>';
-      counts[language] = (counts[language] || 0) + 1;
-      return counts;
-    }, {});
+    const languageCounts: { [key: string]: number } = userStars.reduce(
+      (counts, star) => {
+        const language = star.language || '<None>';
+        counts[language] = (counts[language] || 0) + 1;
+        return counts;
+      },
+      {}
+    );
 
     const languages = Object.entries(languageCounts)
       .sort((a, b) => b[1] - a[1])
@@ -235,18 +264,22 @@ export function StarChart() {
       return [];
     }
 
-    const topicCounts = userStars.reduce((counts, star) => {
-      star.topics.forEach((topic) => {
-        counts[topic] = (counts[topic] || 0) + 1;
-      });
-      return counts;
-    }, {});
+    const topicCounts: { [key: string]: number } = userStars.reduce(
+      (counts, star) => {
+        star.topics.forEach((topic: string) => {
+          counts[topic] = (counts[topic] || 0) + 1;
+        });
+        return counts;
+      },
+      {}
+    );
 
     const topics = Object.entries(topicCounts)
       .sort((a, b) => b[1] - a[1])
       .map(([topic, count]) => ({
         value: topic,
         label: `${topic} (${count})`,
+        options: [],
       }));
 
     return topics;
@@ -258,11 +291,14 @@ export function StarChart() {
       return [];
     }
 
-    const ownerCounts = userStars.reduce((counts, star) => {
-      const owner = star.owner.login;
-      counts[owner] = (counts[owner] || 0) + 1;
-      return counts;
-    }, {});
+    const ownerCounts: { [key: string]: number } = userStars.reduce(
+      (counts, star) => {
+        const owner = star.owner.login;
+        counts[owner] = (counts[owner] || 0) + 1;
+        return counts;
+      },
+      {}
+    );
 
     const owners = Object.entries(ownerCounts)
       .sort((a, b) => b[1] - a[1])
@@ -274,29 +310,35 @@ export function StarChart() {
     return owners;
   }, [githubStars, username]);
 
-  const onLanguagesFilterChanged = useCallback((selectedOptions) => {
+  const onLanguagesFilterChanged = useCallback((selectedOptions: any) => {
     setFilterObj((prevFilterObj) => ({
       ...prevFilterObj,
-      languages: selectedOptions.map((option) => option.value),
+      languages: selectedOptions.map((option: {value: string}) => option.value),
     }));
-    gridRef.current.api.onFilterChanged();
+    if (gridRef.current) {
+      gridRef.current.api.onFilterChanged();
+    }
   }, []);
 
-  const onTopicsFilterChanged = useCallback((selectedOptions) => {
+  const onTopicsFilterChanged = useCallback((selectedOptions: any) => {
     setFilterObj((prevFilterObj) => ({
       ...prevFilterObj,
-      topics: selectedOptions.map((option) => option.value),
+      topics: selectedOptions.map((option: {value: string}) => option.value),
     }));
     setSelectedTopicsValue(selectedOptions);
-    gridRef.current.api.onFilterChanged();
+    if (gridRef.current) {
+      gridRef.current.api.onFilterChanged();
+    }
   }, []);
 
-  const onOwnersFilterChanged = useCallback((selectedOptions) => {
+  const onOwnersFilterChanged = useCallback((selectedOptions: any) => {
     setFilterObj((prevFilterObj) => ({
       ...prevFilterObj,
-      owners: selectedOptions.map((option) => option.value),
+      owners: selectedOptions.map((option: {value: string}) => option.value),
     }));
-    gridRef.current.api.onFilterChanged();
+    if (gridRef.current) {
+      gridRef.current.api.onFilterChanged();
+    }
   }, []);
 
   // Render

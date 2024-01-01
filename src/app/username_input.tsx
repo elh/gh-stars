@@ -37,7 +37,7 @@ export function UsernameInput() {
         <input
           type="text"
           placeholder="elh"
-          className="input input-sm input-bordered w-full max-w-xs"
+          className="input input-sm input-bordered w-full max-w-xs mb-52"
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           onKeyPress={handleKeyPress}
