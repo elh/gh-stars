@@ -280,7 +280,6 @@ export function StarChart() {
       .map(([topic, count]) => ({
         value: topic,
         label: `${topic} (${count})`,
-        options: [],
       }));
 
     return topics;
