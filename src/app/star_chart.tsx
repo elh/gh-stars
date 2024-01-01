@@ -34,10 +34,11 @@ export function StarChart() {
   const [selectedTopicsValue, setSelectedTopicsValue] = useState([]);
 
   // Store
-  const { username, githubStars, loading } = useStore((state) => ({
+  const { username, githubStars, loading, loading_fetched_count } = useStore((state) => ({
     username: state.username,
     githubStars: state.githubStars,
     loading: state.loading,
+    loading_fetched_count: state.loading_fetched_count,
   }));
 
   // AG Grid
@@ -346,7 +347,6 @@ export function StarChart() {
     return null;
   }
 
-  // TODO: move loading to header. show progress bar and expected total count from html
   if (!loading && !githubStars.get(username)) {
     return (
       <div className="flex items-center justify-center">
@@ -363,7 +363,7 @@ export function StarChart() {
       <div className="flex flex-col h-full w-full">
         {loading && (
           <div className="text-center mb-2">
-            <div className="text-sm text-gray-500">Loading ...</div>
+            <div className="text-sm text-gray-500">Loading ... Fetched {loading_fetched_count}</div>
           </div>
         )}
         <Select

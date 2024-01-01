@@ -3,34 +3,44 @@ import create from 'zustand';
 type Store = {
   username: string;
   githubStars: Map<string, any[]>;
+  githubStarsCount: Map<string, number>;
   loading: boolean;
+  loading_fetched_count: number;
   setUsername: (username: string) => void;
   fetchGithubStars: (username: string) => Promise<void>;
 };
 
-
 export const useStore = create<Store>((set, get) => ({
   username: '',
   githubStars: new Map<string, any[]>(),
+  githubStarsCount: new Map<string, number>(),
   loading: false,
+  loading_fetched_count: 0,
   setUsername: (username) => set({ username }),
   fetchGithubStars: async (username) => {
-    set({ loading: true });
+    set({
+      loading: true,
+      loading_fetched_count: 0,
+    });
     try {
+      const perPage = 100;
       let page = 1;
       let stars: any[] = [];
       while (true) {
-        const response = await fetch(`https://api.github.com/users/${username}/starred?per_page=100&page=${page}`);
+        const response = await fetch(`https://api.github.com/users/${username}/starred?per_page=${perPage}&page=${page}`);
         const data = await response.json();
-        if (data.length === 0) {
-          break;
-        }
         stars = [...stars, ...data];
         set((state) => {
           const updatedGithubStars = new Map<string, any[]>(state.githubStars);
           updatedGithubStars.set(username, stars);
-          return { githubStars: updatedGithubStars };
+          return {
+            githubStars: updatedGithubStars,
+            loading_fetched_count: state.loading_fetched_count + data.length,
+          };
         });
+        if (data.length < perPage) {
+          break;
+        }
         page++;
       }
     } catch (error) {
@@ -40,3 +50,8 @@ export const useStore = create<Store>((set, get) => ({
     }
   },
 }));
+
+function getGithubStarsCount(user: string): number {
+  // TODO
+  return 0
+}
