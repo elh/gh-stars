@@ -17,6 +17,10 @@ const customStyles = {
   menu: (_: any) => 'bg-base-200 shadow-lg rounded-md py-1 px-2 z-50 max-w-xs',
   menuList: (_: any) => 'text-sm z-50 max-w-xs no-scrollbar',
   noOptionsMessage: (_: any) => 'text-sm z-50 max-w-xs',
+  // NOTE: underlying elements are not addressable so this doesn't work. hack directly in css
+  clearIndicator: (_: any) => 'hidden',
+  dropdownIndicator: (_: any) => 'hidden',
+  indicatorsContainer: (_: any) => 'hidden',
 };
 
 // TODO: support rendering for multiple users. everyone user is following?

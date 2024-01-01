@@ -48,13 +48,18 @@ html {
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
-/* select-react */
+/* select-react hacks... */
 
 html {
+    /* development */
     .css-cp01gg-control {
         min-height: auto;
     }
     .css-4xgw5l-IndicatorsContainer2 {
+        display: none;
+    }
+    /* production */
+    .css-g56vrd-indicatorContainer {
         display: none;
     }
 }
