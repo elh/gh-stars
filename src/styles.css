@@ -15,7 +15,8 @@ html {
 
 /* hack: boosting specificity with html*/
 html {
-    .ag-theme-balham {
+    /* "cyberpunk" Daisy UI theme */
+    /* .ag-theme-balham {
         --ag-header-foreground-color: black;
         --ag-header-background-color: oklch(0.7422 0.209 6.35);
         --ag-subheader-background-color: oklch(0.7422 0.209 6.35);
@@ -24,6 +25,22 @@ html {
         --ag-background-color: oklch(0.9451 0.179 104.32);
         --ag-odd-row-background-color: oklch(0.9451 0.179 104.32);
         --ag-row-hover-color: oklch(0.7422 0.209 6.35);
+    } */
+
+    /* "black" Daisy UI theme */
+    .ag-theme-balham {
+        --ag-foreground-color: oklch(0.876096 0 0);
+        --ag-header-foreground-color: oklch(0.876096 0 0);
+        --ag-header-background-color: oklch(0.191251, 0, 0);
+        --ag-header-column-resize-handle-color: oklch(0.191251, 0, 0);
+        --ag-subheader-background-color: oklch(0.191251, 0, 0);
+        --ag-font-family: ui-sans-serif, system-ui, -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        --ag-font-size: 0.9rem;
+        --ag-background-color: oklch(0, 0, 0);
+        --ag-odd-row-background-color: oklch(0, 0, 0);
+        --ag-row-hover-color: oklch(0.191251, 0, 0);
+        --ag-border-color: transparent;
+        --ag-row-border-color: transparent;
     }
 }
 /* ------------------------------------------------------------------------------------------------------------------ */
