@@ -9,12 +9,12 @@ export function NavBar() {
   return (
     <div className="navbar px-8 bg-base-100">
       <div className="flex-1">
-        <a className="text-lg">Star Explorer</a>
+        <a className="text-xl">Star Explorer</a>
       </div>
       {username && (
         <div className="text-sm">
           <span>{username}</span>
-          <button className="btn btn-sm ml-2" onClick={() => setUsername('')} >
+          <button className="btn btn-outline btn-sm ml-4" onClick={() => setUsername('')} >
             Switch
           </button>
         </div>

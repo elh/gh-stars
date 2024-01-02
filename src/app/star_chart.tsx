@@ -103,7 +103,7 @@ export function StarChart() {
                   <span
                     key={index}
                     className={`text-[8px] btn btn-xs no-animation py-1 px-3 m-[0.5px] rounded-full ${
-                      filterObj.topics.includes(topic) ? 'btn-secondary' : ''
+                      filterObj.topics.includes(topic) ? 'btn-warning' : ''
                     }`}
                     onClick={() => {
                       if (filterObj.topics.includes(topic)) {
