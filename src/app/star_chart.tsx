@@ -5,7 +5,7 @@ import { useStore } from './store';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import { ICellRendererParams, IRowNode, GridOptions } from 'ag-grid-community';
+import { ICellRendererParams, IRowNode, GridOptions, GetRowIdParams } from 'ag-grid-community';
 
 import Select from 'react-select';
 
@@ -52,6 +52,7 @@ export function StarChart() {
         type: 'fitCellContents',
       },
       rowBuffer: 50,
+      getRowId: (params: GetRowIdParams) => params.data.html_url,
     }),
     []
   );
