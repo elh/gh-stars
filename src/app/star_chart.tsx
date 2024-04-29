@@ -51,6 +51,7 @@ export function StarChart() {
       autoSizeStrategy: {
         type: 'fitCellContents',
       },
+      rowBuffer: 50,
     }),
     []
   );
